@@ -1,69 +1,89 @@
 package com.jf.springbootactiviti.web.controller;
 
-import com.jf.springbootactiviti.utils.SecurityUtil;
-import org.activiti.api.process.model.ProcessDefinition;
-import org.activiti.api.process.model.ProcessInstance;
-import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
-import org.activiti.api.process.runtime.ProcessRuntime;
-import org.activiti.api.runtime.shared.query.Page;
-import org.activiti.api.runtime.shared.query.Pageable;
-import org.activiti.api.task.model.Task;
-import org.activiti.api.task.model.builders.TaskPayloadBuilder;
-import org.activiti.api.task.runtime.TaskRuntime;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.jf.common.api.CommonResult;
+import com.jf.springbootactiviti.form.Process;
+import com.jf.springbootactiviti.service.WorkFlowService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@Api(tags = "增员流程接口")
 @RestController
 @RequestMapping("/activiti")
 public class ActivitiController {
-    @Resource
-    private ProcessRuntime processRuntime;
-    @Resource
-    private TaskRuntime taskRuntime;
-    @Resource
-    private SecurityUtil securityUtil;
+    @Autowired
+    RepositoryService repositoryService;
+    @Autowired
+    WorkFlowService workFlowService;
 
-    /**
-     * 查询流程定义
-     */
-    @RequestMapping("/getProcess")
-    public void getProcess() {
-        //查询所有流程定义信息
-        Page<ProcessDefinition> processDefinitionPage = processRuntime.processDefinitions(Pageable.of(0, 10));
-        System.out.println("当前流程定义的数量：" + processDefinitionPage.getTotalItems());
-        //获取流程信息
-        for (ProcessDefinition processDefinition : processDefinitionPage.getContent()) {
-            System.out.println("流程定义信息" + processDefinition);
+    @ApiOperation(value = "发布流程", notes = "上传并发布一个流程")
+    @PostMapping("deployworkflow")
+    public CommonResult fileupload(@RequestParam MultipartFile uploadfile) {
+        try {
+            String filename = uploadfile.getOriginalFilename();
+            InputStream is = uploadfile.getInputStream();
+            repositoryService.createDeployment().addInputStream(filename, is).deploy();
+            return CommonResult.success("发布成功");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
-    /**
-     * 启动流程示例
-     */
-    @RequestMapping("/startInstance")
-    public void startInstance() {
-        ProcessInstance instance = processRuntime.start(ProcessPayloadBuilder.start().withProcessDefinitionKey("demo").build());
-        System.out.println(instance.getId());
+    @ApiOperation(value = "获取发布的流程", notes = "获取所有已发布流程，未做分页处理")
+    @GetMapping("/listworkflow")
+    public CommonResult listWorkFlow() {
+        try {
+            List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+            List<Process> listProcess = new ArrayList<Process>();
+            list.stream().forEach(processDefinition -> {
+                Process process = new Process();
+                process.setId(processDefinition.getId());
+                process.setDeploymentId(processDefinition.getDeploymentId());
+                process.setKey(processDefinition.getKey());
+                process.setName(processDefinition.getName());
+                process.setResourceName(processDefinition.getResourceName());
+                process.setDiagramresourcename(processDefinition.getDiagramResourceName());
+                listProcess.add(process);
+            });
+            return CommonResult.success(listProcess);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    /**
-     * 获取任务，拾取任务，并且执行
-     */
-    @GetMapping("/getTask")
-    public void getTask() {
-        securityUtil.logInAs("salaboy");//指定组内任务人
-        Page<Task> tasks = taskRuntime.tasks(Pageable.of(0, 10));
-        if (tasks.getTotalItems() > 0) {
-            for (Task task : tasks.getContent()) {
-                System.out.println("任务名称：" + task.getName());
-                //拾取任务
-                taskRuntime.claim(TaskPayloadBuilder.claim().withTaskId(task.getId()).build());
-                //执行任务
-                taskRuntime.complete(TaskPayloadBuilder.complete().withTaskId(task.getId()).build());
-            }
+    @ApiOperation(value = "启动流程", notes = "可以生成信息的时候同时启动流程")
+    @PostMapping("startworkflow")
+    public CommonResult startWorkflow() {
+        //如果流程中有变量，可以传变量到流程中
+        Map<String, Object> variables = new HashMap<String, Object>(2);
+        variables.put("role", 1000);
+        variables.put("userId", "weizh");
+        ProcessInstance ins = workFlowService.startWorkflow(variables);
+        return CommonResult.success(ins.getId(), "启动流程成功");
+    }
+
+    @ApiOperation(value = "获取主管单位审核待办列表", notes = "查询主管单位审核待办列表")
+    @GetMapping("listadminunittask")
+    public CommonResult listAdminUnitTask() {
+        try {
+            List<String> list = workFlowService.listTask("主管单位审核");
+            return CommonResult.success(list);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
 }
