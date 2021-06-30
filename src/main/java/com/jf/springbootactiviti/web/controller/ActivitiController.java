@@ -1,6 +1,6 @@
 package com.jf.springbootactiviti.web.controller;
 
-import com.jf.common.api.CommonResult;
+import com.jf.springbootactiviti.api.CommonResult;
 import com.jf.springbootactiviti.form.Process;
 import com.jf.springbootactiviti.service.WorkFlowService;
 import io.swagger.annotations.Api;
@@ -75,11 +75,12 @@ public class ActivitiController {
         return CommonResult.success(ins.getId(), "启动流程成功");
     }
 
-    @ApiOperation(value = "获取主管单位审核待办列表", notes = "查询主管单位审核待办列表")
-    @GetMapping("listadminunittask")
-    public CommonResult listAdminUnitTask() {
+    @ApiOperation(value = "获取事业处初核待办列表", notes = "查询事业处初核待办列表")
+    @GetMapping("listhrchecktask")
+    public CommonResult listHrCheckTask() {
         try {
-            List<String> list = workFlowService.listTask("主管单位审核");
+            //初核岗：可以根据情况使用角色id，或者直接使用初核岗，如果使用角色id，则流程中candidateGroups为角色id，这个可以在画图时选择某个角色进行决定
+            List<String> list = workFlowService.listTask("初核岗");
             return CommonResult.success(list);
         } catch (Exception e) {
             e.printStackTrace();

@@ -38,7 +38,7 @@ public class WorkFlowServiceImpl implements WorkFlowService {
         //实际业务启动流程时需先生成task，然后把taskOid传到流程中，根据taskOid跟流程相关联
         //leave:比如增员可以使用这个启动增员的流程，所以这里可以动态指定使用哪个流程
         String taskOid = "1000";
-        ProcessInstance instance = runtimeservice.startProcessInstanceByKey("leave", taskOid, variables);
+        ProcessInstance instance = runtimeservice.startProcessInstanceByKey("addPerson", taskOid, variables);
         //可以获取流程id，然后写到task中
         String instanceid = instance.getId();
         return instance;
