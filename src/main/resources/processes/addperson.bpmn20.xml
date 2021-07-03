@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="addperson" name="增员" isExecutable="true">
+    <startEvent id="startevent1" name="Start" activiti:initiator="${userid}"/>
+    <userTask id="unitreport" name="单位申报"/>
+    <userTask id="hrcheck" name="人事处初核" activiti:candidateGroups="初核岗"/>
+    <exclusiveGateway id="exclusivegateway1" name="初核排他网关"/>
+    <userTask id="hrrecheck" name="人事处复核" activiti:candidateGroups="复核岗"/>
+    <exclusiveGateway id="exclusivegateway2" name="复核排他网关"/>
+    <endEvent id="endevent1" name="End"/>
+    <sequenceFlow id="flow4102" sourceRef="startevent1" targetRef="unitreport"/>
+    <sequenceFlow id="flow203" sourceRef="unitreport" targetRef="hrcheck"/>
+    <sequenceFlow id="flow310" sourceRef="hrcheck" targetRef="exclusivegateway1"/>
+    <sequenceFlow id="flow314" name="同意" sourceRef="exclusivegateway1" targetRef="hrrecheck">
+      <conditionExpression xsi:type="tFormalExpression">${hrcheck=='Y'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow312" name="退回" sourceRef="exclusivegateway1" targetRef="unitreport">
+      <conditionExpression xsi:type="tFormalExpression">${hrcheck=='N'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow410" sourceRef="hrrecheck" targetRef="exclusivegateway2"/>
+    <sequenceFlow id="flow415" name="同意" sourceRef="exclusivegateway2" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression">${hrrecheck=='Y'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow413" name="退回" sourceRef="exclusivegateway2" targetRef="hrcheck">
+      <conditionExpression xsi:type="tFormalExpression">${hrrecheck=='N'}</conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_person">
+    <bpmndi:BPMNPlane bpmnElement="person" id="BPMNPlane_person">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="114.944" y="230.00002"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow4102" id="BPMNEdge_flow4102">
+        <omgdi:waypoint x="175.0" y="247.0"/>
+        <omgdi:waypoint x="149.94402" y="247.5"/>
+        <omgdi:waypoint x="201.40698" y="247.5"/>
+        <omgdi:waypoint x="222.31763" y="247.50003"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_unitreport" bpmnElement="unitreport">
+        <omgdc:Bounds x="222.31764" y="220.00002" width="105.0" height="55.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow203" bpmnElement="flow203">
+        <omgdi:waypoint x="327.31763" y="247.50003"/>
+        <omgdi:waypoint x="349.89227" y="247.5"/>
+        <omgdi:waypoint x="376.9041" y="247.00002"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="hrcheck" id="BPMNShape_deptleaderaudit">
+        <omgdc:Bounds height="55.0" width="105.0" x="376.9041" y="219.5"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow310" id="BPMNEdge_flow310">
+        <omgdi:waypoint x="481.9041" y="246.5"/>
+        <omgdi:waypoint x="535.0" y="247.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="535.0" y="227.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow314" id="BPMNEdge_flow314">
+        <omgdi:waypoint x="575.0" y="247.0"/>
+        <omgdi:waypoint x="620.0" y="247.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow312" id="BPMNEdge_flow312">
+        <omgdi:waypoint x="555.0" y="267.0"/>
+        <omgdi:waypoint x="555.0" y="337.0"/>
+        <omgdi:waypoint x="414.16928" y="337.00003"/>
+        <omgdi:waypoint x="274.81763" y="337.00003"/>
+        <omgdi:waypoint x="274.81763" y="275.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="hrrecheck" id="BPMNShape_hraudit">
+        <omgdc:Bounds height="55.0" width="105.0" x="620.0" y="220.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow410" id="BPMNEdge_flow410">
+        <omgdi:waypoint x="725.0" y="247.0"/>
+        <omgdi:waypoint x="770.0" y="248.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="770.0" y="228.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow415" id="BPMNEdge_flow415">
+        <omgdi:waypoint x="809.99994" y="248.0"/>
+        <omgdi:waypoint x="875.5035" y="248.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow413" id="BPMNEdge_flow413">
+        <omgdi:waypoint x="789.99994" y="228.0"/>
+        <omgdi:waypoint x="789.99994" y="160.1381"/>
+        <omgdi:waypoint x="607.3165" y="160.13809"/>
+        <omgdi:waypoint x="429.4041" y="160.13809"/>
+        <omgdi:waypoint x="429.4041" y="219.5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="875.5034" y="230.5"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
