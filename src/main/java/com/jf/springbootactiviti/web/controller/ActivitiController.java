@@ -74,7 +74,18 @@ public class ActivitiController {
         ProcessInstance ins = workFlowService.startWorkflow(variables);
         return CommonResult.success(ins.getId(), "启动流程成功");
     }
-
+    @ApiOperation(value = "获取单位申报待办列表", notes = "查询单位申报待办列表")
+    @GetMapping("listunitreporttask")
+    public CommonResult listUnitReportTask() {
+        try {
+            //申报岗：可以根据情况使用角色id，或者直接使用申报岗，如果使用角色id，则流程中candidateGroups为角色id，这个可以在画图时选择某个角色进行决定
+            List<String> list = workFlowService.listTask("申报岗");
+            return CommonResult.success(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     @ApiOperation(value = "获取事业处初核待办列表", notes = "查询事业处初核待办列表")
     @GetMapping("listhrchecktask")
     public CommonResult listHrCheckTask() {

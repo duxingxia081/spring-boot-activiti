@@ -38,26 +38,26 @@ public class WorkFlowServiceImpl implements WorkFlowService {
         //实际业务启动流程时需先生成task，然后把taskOid传到流程中，根据taskOid跟流程相关联
         //leave:比如增员可以使用这个启动增员的流程，所以这里可以动态指定使用哪个流程
         String taskOid = "1000";
-        ProcessInstance instance = runtimeservice.startProcessInstanceByKey("addPerson", taskOid, variables);
+        ProcessInstance instance = runtimeservice.startProcessInstanceByKey("addperson", taskOid, variables);
         //可以获取流程id，然后写到task中
         String instanceid = instance.getId();
         return instance;
     }
     /**
      * @description: 获取某个环节待办数据
-     * @param: group(用户角色)
+     * @param: role(用户角色)
      * @author: weizh
      * @date: 2021/6/29 17:26
      * @version: 1.0
      */
     @Override
-    public List<String> listTask(String group) {
+    public List<String> listTask(String role) {
         List<String> results = new ArrayList<>();
         //此例子可以使用分页
         int firstrow = 0;
         int rowcount = 30;
-        //获取到当前在主管单位审核环节任务
-        List<Task> tasks = taskservice.createTaskQuery().taskCandidateGroup(group).listPage(firstrow, rowcount);
+        //获取到当前role角色环节的任务
+        List<Task> tasks = taskservice.createTaskQuery().taskCandidateGroup(role).listPage(firstrow, rowcount);
         for (Task task : tasks) {
             String instanceid = task.getProcessInstanceId();
             //根据任务获取启动运行时传的taskOid
