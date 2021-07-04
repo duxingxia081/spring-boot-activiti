@@ -173,7 +173,7 @@ public class WorkFlowServiceImpl implements WorkFlowService {
         List<String> results = new ArrayList<>();
         List<HistoricProcessInstance> ListHistory = historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey("addperson").finished().list();
-        if (CollectionUtils.isNotEmpty(results)) {
+        if (CollectionUtils.isNotEmpty(ListHistory)) {
             ListHistory.stream().forEach((history) -> results.add(history.getBusinessKey()));
         }
         return results;
