@@ -12,17 +12,17 @@
     <sequenceFlow id="flow203" sourceRef="unitreport" targetRef="hrcheck"/>
     <sequenceFlow id="flow310" sourceRef="hrcheck" targetRef="exclusivegateway1"/>
     <sequenceFlow id="flow314" name="同意" sourceRef="exclusivegateway1" targetRef="hrrecheck">
-      <conditionExpression xsi:type="tFormalExpression">${hrcheck=='Y'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${hrcheck=='Y'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow312" name="退回" sourceRef="exclusivegateway1" targetRef="unitreport">
-      <conditionExpression xsi:type="tFormalExpression">${hrcheck=='N'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${hrcheck=='N'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow410" sourceRef="hrrecheck" targetRef="exclusivegateway2"/>
     <sequenceFlow id="flow415" name="同意" sourceRef="exclusivegateway2" targetRef="endevent1">
-      <conditionExpression xsi:type="tFormalExpression">${hrrecheck=='Y'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${hrrecheck=='Y'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow413" name="退回" sourceRef="exclusivegateway2" targetRef="hrcheck">
-      <conditionExpression xsi:type="tFormalExpression">${hrrecheck=='N'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${hrrecheck=='Y'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_person">

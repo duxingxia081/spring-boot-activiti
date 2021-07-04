@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -128,8 +129,8 @@ public class WorkFlowServiceImpl implements WorkFlowService {
      * @version: 1.0
      */
     @Override
-    public List<String> listTask(String role) {
-        List<String> results = new ArrayList<>();
+    public List<Map<String, String>> listTask(String role) {
+        List<Map<String, String>> results = new ArrayList<>();
         //此例子可以使用分页
         int firstrow = 0;
         int rowcount = 30;
@@ -141,7 +142,12 @@ public class WorkFlowServiceImpl implements WorkFlowService {
             ProcessInstance proces = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             String taskOid = proces.getBusinessKey();
             //TODO(根据taskOid查询业务信息，待补充)
-            results.add(processInstanceId);
+            Map<String, String> map = new HashMap<>();
+            map.put("taskId", task.getId());
+            map.put("processInstanceId", processInstanceId);
+            map.put("taskOid", taskOid);
+            map.put("processDefinitionId", proces.getProcessDefinitionId());
+            results.add(map);
         }
         return results;
     }
@@ -154,7 +160,7 @@ public class WorkFlowServiceImpl implements WorkFlowService {
      */
     public void completeTask(Map<String, Object> variables, String taskId) {
         taskService.claim(taskId, "weizh");
-        taskService.complete(taskId);
+        taskService.complete(taskId,variables);
     }
 
     /**
@@ -163,10 +169,10 @@ public class WorkFlowServiceImpl implements WorkFlowService {
      * @date: 2021/7/4 12:37 下午
      * @version: 1.0
      */
-    public List<String> listFinishTask(int startNum, int rowCount) {
+    public List<String> listFinishTask() {
         List<String> results = new ArrayList<>();
         List<HistoricProcessInstance> ListHistory = historyService.createHistoricProcessInstanceQuery()
-                .processDefinitionKey("addperson").startedBy("weizh").finished().listPage(startNum, rowCount);
+                .processDefinitionKey("addperson").finished().list();
         if (CollectionUtils.isNotEmpty(results)) {
             ListHistory.stream().forEach((history) -> results.add(history.getBusinessKey()));
         }
@@ -192,15 +198,13 @@ public class WorkFlowServiceImpl implements WorkFlowService {
      * @date: 2021/7/4 12:59 下午
      * @version: 1.0
      */
-    public InputStream generateDiagram(String processInstanceId) {
+    public InputStream generateDiagram(String executionId) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId).singleResult();
-
+                .processInstanceId(executionId).singleResult();
         if (processInstance != null) {
-            BpmnModel model = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
-
+            BpmnModel model = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
             if (model != null && model.getLocationMap().size() > 0) {
-                List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
+                List<String> activeActivityIds = runtimeService.getActiveActivityIds(executionId);
                 ProcessDiagramGenerator generator = new DefaultProcessDiagramGenerator();
                 // 生成流程图 已启动的task 高亮
                 return generator.generateDiagram(model, activeActivityIds);

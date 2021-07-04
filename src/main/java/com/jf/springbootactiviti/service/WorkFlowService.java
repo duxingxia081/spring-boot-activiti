@@ -54,7 +54,7 @@ public interface WorkFlowService {
      * @date: 2021/7/3 17:26
      * @version: 1.0
      */
-    List<String> listTask(String group);
+    List<Map<String,String>> listTask(String group);
     /**
      * @description: 流程流转
      * @author: weizh
@@ -68,7 +68,7 @@ public interface WorkFlowService {
      * @date: 2021/7/4 12:37 下午
      * @version: 1.0
      */
-    List<String> listFinishTask(int startNum,int rowCount);
+    List<String> listFinishTask();
     /**
      * @description: 获取历史数据
      * @author: weizh
@@ -82,5 +82,5 @@ public interface WorkFlowService {
      * @date: 2021/7/4 12:59 下午
      * @version: 1.0
      */
-    InputStream generateDiagram(String processInstanceId);
+    InputStream generateDiagram(String executionId);
 }
